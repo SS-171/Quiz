@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+    <title>Administrator</title>
+</head>
+<style>
+    .content{
+        display: flex;
+        flex-direction: column;
+        margin-left: 20px;
+    }
+    form{
+        
+        width: 40%;
+         
+    }
+    .input-group{
+        display: flex;
+        flex-direction: column;
+        font-size: 15px;
+        padding: 6px 0px;
+    }
+    
+    .input-group input{
+        border-radius: 4px;
+        font-size: 15px;
+        border: 2px solid rgb(53, 62, 66);
+        margin: 0 auto;
+        padding: 4px 0;
+        margin: 10px 0;
+    }
+    input[type=submit], .btn{
+        padding: 10px;
+        font-weight: bold;
+       
+    }
+    input[type=submit]:hover, .delete-btn:hover{
+        cursor: pointer;
+        background-color:rgb(165, 184, 235);
+    }
+    input:focus{
+        outline: none;
+        border-color: #719ECE;
+        border-radius: 0;
+    }
+    .delete-form{
+        margin-top: 50px;
+    }
+    .delete-btn{
+        background-color: rgba(96, 228, 210, 0.867);
+        border: 1px solid #ccc;
+        margin-left: 5px;
+    }
+</style>
+<body>
+    <div class="content">
+
+        <form action="" id='postForm'>
+            <div class="input-group">
+                <label for="">Question title:</label>
+                <input type="text" name="title">
+            </div>
+            <div class="input-group">
+                <label for="">Answer A:</label>
+                <input type="text" name="a">
+            </div>
+            <div class="input-group">
+                <label for="">Answer B:</label>
+                <input type="text" name="b">
+            </div>
+            <div class="input-group">
+                <label for="">Answer C:</label>
+                <input type="text" name="c">
+            </div>
+            <div class="input-group">
+                <label for="">Right answer:</label>
+                <input type="text" name="ans">
+            </div>
+            <input type="submit" value="Post" class ='submit'>
+        </form>
+        <div class="delete-form">
+            <span class='delete-text'></span>
+            <input type="number" class="delete-input">
+            <button class="delete-btn">Delete</button>
+        </div>
+    </div>
+    
+</body>
+<script>
+    $(document).ready(function(){
+        
+        
+        function postData(input, action) {            
+            $.ajax({
+                type: "POST",
+                url : `http://localhost:81/test/restfulAPI/API/question/${action}.php`,
+                data: input,
+                success: function(response){
+                    console.log(response.responseText);
+                }
+
+            })
+        };
+        $('.submit').click(function(){
+            formData = $('#postForm').serialize();
+            postData(formData, 'create');
+            $('input[type = text]').val('');
+            return false;
+        });
+        $('.delete-btn').click(function(){
+            var deleteID = {
+                id: $('.delete-input').val()};
+            postData(deleteID, 'delete')
+        })
+
+    })
+    
+</script>
+</html>

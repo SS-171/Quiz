@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <title>Multiple choice test </title>
+</head>
+<style>
+    *{
+        box-sizing: border-box;
+       margin: 0;
+    }
+    html{
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+    body{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+    }
+    .wrap-test{
+        position: relative;
+        width: 50%;
+        margin: 0 auto;
+        
+    }
+    .test__title{
+        display: block;
+        font-size:16px;
+        font-weight: 600;
+        padding: 10px 0;
+    }
+    .test__choice{
+        padding: 0;
+
+    }
+    .test__choice-item{
+        display: block;
+        border: 1px solid #ccc;
+        padding: 8px 10px;
+    }
+     .test__choice-item:last-child{
+        border-top: none;
+    }
+    .test__choice-item:first-child{
+        border-bottom: none;
+    }
+    .test__choice-item:hover{
+        cursor: pointer;
+        background-color: rgb(236, 229, 229, 0.6);
+    }
+    .test__choice-item--right{
+        background-color: #3bc4fa ;
+        animation: blink linear 2s;
+    }
+    .test__choice-item--chosen{
+        background-color: #93e49a ;
+    }
+    .test__choice-item--chosen:hover{
+        background-color: #93e49a ;
+    }
+    .test__choice-item--right:hover{
+        background-color: #ace3f8;
+    }
+    @keyframes blink {
+        0% {
+            background-color: #3bc4fa;
+        }
+        35% {
+            background-color: #fff;
+        }
+        70%{
+            background-color: #3bc4fa;
+        }
+        90%{
+            background-color: #fff;
+        }
+        
+    }
+    .test__choice-item--wrong{
+        background-color:rgb(228, 53, 53) !important;
+    }
+    .btn {
+        padding: 10px 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        margin-top: 12px;
+        font-weight: 600;
+        letter-spacing:1px;
+    }
+    .btn:hover{
+        background-color:rgba(233, 197, 197, 0.3);
+        cursor: pointer;
+    }
+    .btn.next{
+        float: right;
+    }
+    .done-handle{
+        display: block;
+        margin-bottom: 20px;
+    }
+    .done-handle .btn{
+        background-color: #7770e0;
+        color: #fff;
+    }
+    .replay{
+        display: none;
+    }
+    .title{
+        text-align: center;
+        margin: 15px 0;
+        color: #c53353;
+    }
+    .alert{
+        display: block;
+        font-size:18px;
+        color: red;
+        margin-bottom: 30px;
+     
+    }
+</style>
+    
+<body>
+    <span class='alert'></span>
+    
+    <div class="wrap-test">
+        <h2 class="title">MULTIPLE CHOICE TEST</h2>
+        <div class="done-handle">
+            <button class="btn submit" >Submit</button>
+            <button class="btn replay">Replay</button>
+        </div>
+        <span class="test__title"></span>
+        <div class="content">
+
+        </div>
+      
+    </div>
+</body>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var count_id=1;
+        var numRight= 0;
+        var maxID =0;
+        function getMaxID(){
+             $.get('http://localhost:81/test/restfulAPI/API/question/read.php', {}, function(data) {
+                maxID= Object.values(data.data)[0].length;
+            }
+        )};
+        getMaxID();
+        function render(getID){
+            
+            $.get('http://localhost:81/test/restfulAPI/API/question/show.php',{id:getID}, function(data){
+                
+                $('.test__title').html(`Question ${getID}: ${data.title}`);
+                $('.content').html(`
+                <ul class="test__choice">
+                    <li class="test__choice-item " order='a'>${data.question_A}</li>
+                    <li class="test__choice-item " order='b'>${data.question_B}</li>
+                    <li class="test__choice-item "  order='c'>${data.question_C}</li>
+                </ul>
+                <button class="btn confirm" >Confirm</button>
+                <button id ='next' class="btn next">Next</button>
+                `);
+                    //confirm answer
+                   
+                           
+                            var chosen_arr = [];
+                            $(".test__choice-item").each(function(index, value){
+                                                   
+                                value.onclick =function(){
+                    
+                                    value.classList.toggle('test__choice-item--chosen');
+                                    if(value.classList.contains('test__choice-item--chosen'))
+                                    {
+                                        chosen_arr.push(value.getAttribute('order'));
+                                        
+                                    }
+                                    else {
+                                        var index = chosen_arr.indexOf(value.getAttribute('order'))
+                                        if(index !==-1) chosen_arr.splice(index,1);
+                                        
+                                    }
+                                                                                
+                                }
+                            });
+                            //Confirm function
+                                $('.confirm').click(function(){
+                                    confirmHandle(chosen_arr);
+                                                                                                                                           
+                                });
+                            
+                                /// Child function
+                            function confirmHandle(chosen_arr1){
+
+                                if(chosen_arr1.length !==0)
+                                {
+                                    chosen_arr1.forEach(function(each){
+                                        var element = $('.test__choice-item[order='+ each + ']');
+                                        element.removeClass('test__choice-item--chosen');
+                                        if(each !== data.right_ans){
+                                            element.addClass('test__choice-item--wrong'); 
+                                        }
+                                        else {
+                                            if(chosen_arr1.length ===1 ){
+                                                numRight += 1;
+                                            }
+                                        }
+                                        
+                                    })
+                                    
+
+                                }
+                                
+                                $('.test__choice-item[order='+ data.right_ans + ']').addClass('test__choice-item--right');
+                                $(".test__choice-item").css({
+                                                "cursor": "wait",
+                                                "pointer-events": "none"
+                                    });
+                                
+                            }
+                            $('#next').click(function(){   
+                               if(count_id < maxID){
+
+                                   count_id = count_id +1; 
+                                   render(count_id);
+                               }
+                                
+                                else {
+                                    
+                                    $('#next').css('display', 'none');
+                                }
+
+                                });
+                           
+                                                                                                    
+            });
+        };
+        if(count_id ===1)
+        {
+            render(count_id);
+        }
+        //SUBMIT action
+         $('.submit').click(function () {
+             var alertStr = `Congratulation! You got ${numRight} correct answer!`;
+             if(numRight ===0)
+             {
+                alertStr = "Opps!. No right answer. Please try again."
+             }
+            
+            $('.replay').css('display', 'block');
+            $('.confirm').css('display', 'none');
+            $('.next').css('display', 'none');
+            $('.submit').css('display', 'none');
+            $('.alert').html(alertStr);
+
+
+        });
+        //REPLAY action 
+        $('.replay').click(function () {
+           count_id =1;
+           render(count_id);
+           $('.replay').css('display', 'none');
+            $('.submit').css('display', 'block');
+            $('.alert').html('');
+        });
+        
+    })
+</script>
+</html>
