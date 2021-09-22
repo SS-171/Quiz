@@ -151,14 +151,14 @@
         var numRight= 0;
         var maxID =0;
         function getMaxID(){
-             $.get('http://localhost:81/test/restfulAPI/API/question/read.php', {}, function(data) {
+             $.get('https://quiz171.000webhostapp.com/API/question/read.php', {}, function(data) {
                 maxID= Object.values(data.data)[0].length;
             }
         )};
         getMaxID();
         function render(getID){
             
-            $.get('http://localhost:81/test/restfulAPI/API/question/show.php',{id:getID}, function(data){
+            $.get('https://quiz171.000webhostapp.com/API/question/show.php',{id:getID}, function(data){
                 
                 $('.test__title').html(`Question ${getID}: ${data.title}`);
                 $('.content').html(`
