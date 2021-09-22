@@ -98,7 +98,7 @@
         function postData(input, action) {            
             $.ajax({
                 type: "POST",
-                url : `http://localhost:81/test/restfulAPI/API/question/${action}.php`,
+                url : `https://quiz171.000webhostapp.com/API/question/${action}.php`,
                 data: input,
                 success: function(response){
                     console.log(response.responseText);
