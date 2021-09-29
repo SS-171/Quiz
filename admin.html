@@ -113,8 +113,11 @@
                 url : `https://quiz171.000webhostapp.com/API/question/${action}.php`,
                 data: input,
                 success: function(response){
-                    console.log(response.responseText);
-                }
+                    alert(response.responseText);
+                },
+                 error: function(response) {
+                     alert(response.responseText);
+                 }
 
             })
         };
