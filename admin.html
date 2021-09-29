@@ -96,7 +96,7 @@
             <input type="submit" value="Post" class ='submit'>
         </form>
         <div class="delete-form">
-            <span class='delete-text'></span>
+            <span class='delete-text'>Delete question has ID:</span>
             <input type="number" class="delete-input">
             <button class="delete-btn">Delete</button>
         </div>
@@ -121,16 +121,26 @@
 
             })
         };
-        $('.submit').click(function(){
+           $('.submit').click(function(){
             formData = $('#postForm').serialize();
-            postData(formData, 'create');
+            let inputVal = $('input[type = text]');
+            let t =0;
+            inputVal.each(function(index, each){
+                if(!each.value){
+                    t =1 ;
+                }
+            })
+
+            t===0?postData(formData, 'create'):alert('Not valid input!');
+            
             $('input[type = text]').val('');
             return false;
         });
         $('.delete-btn').click(function(){
             var deleteID = {
                 id: $('.delete-input').val()};
-            postData(deleteID, 'delete')
+            postData(deleteID, 'delete');
+            $('.delete-input').val('');
         })
 
     })
